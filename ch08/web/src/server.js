@@ -7,12 +7,22 @@ const app = express();
 app.set('view engine', 'html');
 app.engine('html', mustacheExpress());          // register file extension 
 app.set('views', __dirname);
+console.log("__dirname: " + __dirname);
+app.use(express.static(__dirname + '/public'));
 
-app.get('/',function(req,res){
-    res.status(200).send('Pets Demo Application');
+const fs = require('fs');
+
+fs.readdirSync(__dirname).forEach(file => {
+  console.log(file);
 });
 
-app.get('/pet',function(req,res){
+
+/*app.get('/',function(req,res){
+    res.status(200).send('Pets Demo Application Manuel go to PET demo /pet');
+});*/
+
+//app.get('/pet',function(req,res){
+app.get('/',function(req,res){
     const client = new Client({
         user: 'dockeruser',
         password: 'dockerpass',

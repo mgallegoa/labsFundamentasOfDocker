@@ -10,6 +10,11 @@ div.container {
     padding: 10px;
     text-align: center;
 }
+div.keyNotes {
+    border: 10px solid white;
+    padding: 10px;
+    text-align: left;
+}
 
 h4 {
     text-transform: uppercase;

@@ -1,0 +1,401 @@
+<html>
+<head>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="keyNotes">
+	    <h2>Book images----></h2>
+        <h5>https://subscription.packtpub.com/book/networking_and_servers/9781788997027/13/ch13lvl1sec125/zero-downtime-deployments</h5>
+        
+		<p>
+		<p>daemon.json ---> /data/docker
+        <p>(https://www.mcseccna.cloud/mike-kreuzer-resume/doku.php?id=books_read_by_mike_kreuzer_phd_for_mcse_mct_mcp_mcsa_ccna_azure_cloud_exchange_windows_server_linux)
+        <p>(https://stackexchange.com/users/12826866/cloud-monk-kreuzer-phd-mcse?tab=accounts)
+        <h2>docker don´t support 32bits architecture, but this is one option:</h2>
+<p>        (https://medium.com/@chrispatten/installing-and-running-docker-on-32-bit-windows-d18b95ee1fc3)
+<p>        <p><p>
+		1. installing Oracle’s VirtualBox
+<p>2. On PowerShell (install chocolate packege manager for windows)
+  <p>choco install docker-machine -y
+  <p>docker-machine create --driver virtualbox default   (docker-machine create default --virtualbox-no-vtx-check)
+  <p>docker-machine env | Invoke-Expression
+
+<p>3. Create the default host environment:
+<p>   docker-machine env default    (docker-machine start default)
+<p>
+<p>4. Connect to the host:
+   <p>docker-machine ssh default
+<p>
+<p>5. Verify:
+<p>  PS C:\Windows\system32> docker version
+<p>
+<p>6. Run container:
+<p>  docker run hello-world
+<p>
+<p>On Ubuntu:
+<p>https://stackoverflow.com/questions/37989534/how-to-install-docker-on-32bit-machine-having-ubuntu-12-04
+<p>
+<p>
+<p>
+<p>Install kubernet with chocolately:
+<p>1. choco install kubernetes-cli
+<p>2. choco install minikube
+<p>3. minikube start
+<p>4. minikube version (kubectl version)
+<p>
+<p>https://kubernetesbootcamp.github.io/kubernetes-bootcamp/1-1.html
+<p>
+<p>Docker commands:
+<p>1. Run container:
+<p>docker container run alpine echo "Hello World"
+<p>
+<p>Run in background:
+<p>docker container run -d --name quotes alpine \
+<p>/bin/sh -c "while :; do wget -qO- https://talaikis.com/api/quotes/random; printf '\n';
+<p>sleep 5; done"
+<p>2. List all containers: docker container ls -l (-a for all, -q just show the name)
+<p>3. Delete all containers: docker container rm -force $(docker container ls -a -q)
+<p>4. Stop container (send signal SIGTERM afther 10 seconds send signal SIGKILL): 
+<p>docker container stop quotes
+<p>other way:
+<p>export CONTAINER_ID = $(docker container ls | grep quotes | awk '{print $1}')
+<p>docker container stop $CONTAINER_ID
+<p>5. Start container: docker container start quotes
+<p>6. Info container: docker container inspect quotes
+<p>docker container inspect -f "{{json .State}}" quotes | jq
+<p>7. Exec (-i interactive command -t Terminal emulator -d processes as deamon -e variables):
+<p>docker container exec -i -t quotes /bin/sh
+<p>ps (exit)
+<p>docker container exec -it \
+<p>-e MY_VAR="Hello World" \
+<p>quotes /bin/sh
+<p># / echo $MY_VAR
+<p>Hello World
+<p># / exit
+<p>8. For attach to the output:
+<p>docker container attach quotes
+<p>docker run -d --name nginx -p 8080:80 nginx:alpine
+<p>curl -4 localhost:8080
+<p>9. Logs:
+<p>docker container logs --tail 9 quotes (docker container logs --tail 9 --follow quotes)
+<p>10. Search default logs format:
+<p>docker info --format '{{.LoggingDriver}}'
+<p>Search container logs format:
+<p>docker inspect -f '{{.HostConfig.LogConfig.Type}}' <CONTAINER>
+<p>
+<p>11. Update a container:
+<p>docker container run -it --name sample alpine /bin/sh
+<p>apk update && apk add iputils
+<p>12. docker container diff sample
+<p>13. docker container commit sample my-alpine
+<p>14. docker image history my-alpine
+<p>
+<p>15. Create container from Docker file:
+<p>cat > Dockerfile  (documentation https://www.howtogeek.com/199687/how-to-quickly-create-a-text-file-using-the-command-line-in-linux/)
+<p>FROM centos:7
+<p>RUN yum install -y wget
+<p>16. Build the image:
+<p>docker image build -t my-centos .
+<p>
+<p>17. Multi-builds:
+<p>FROM alpine:3.7 AS build
+<p>RUN apk update && \
+<p>apk add --update alpine-sdk
+<p>RUN mkdir /app
+<p>WORKDIR /app
+<p>COPY . /app
+<p>RUN mkdir bin
+<p>RUN gcc hello.c -o bin/hello
+<p>FROM alpine:3.7
+<p>COPY --from=build /app/bin/hello /app/hello
+<p>CMD /app/hello
+<p>
+<p>docker image build -t hello-world-small .
+<p>
+<p>18. Best practices:
+<p>RUN apt-get update
+<p>RUN apt-get install -y ca-certificates
+<p>RUN rm -rf /var/lib/apt/lists/*
+<p>
+<p>--->
+<p>RUN apt-get update \
+<p>&& apt-get install -y ca-certificates \
+<p>&& rm -rf /var/lib/apt/lists/*
+<p>
+<p>19. Saving and load images
+<p>docker image save -o ./backup/my-alpine.tar my-alpine
+<p>docker image load -i ./backup/my-alpine.tar
+<p>
+<p>20. Pull specific version:
+<p>docker image pull alpine:3.5
+<p>
+<p>21. Pushin images (default docker.oi):
+<p>docker image tag alpine:latest gnschenker/alpine:1.0
+<p>docker login -u gnschenker -p <my secret password>
+<p>docker image push gnschenker/alpine:1.0
+<p>
+<p>22. Work with volumes:
+<p>docker-machine create node-1 --virtualbox-no-vtx-check
+<p>docker-machine start node-1
+<p>docker-machine ssh node-1
+<p>docker volume create my-data
+<p>docker volume inspect my-data (cd /mnt/sda1/var/lib/docker/volumes/my-data/_data)
+<p>
+<p>23. Mounting volumen:
+<p>docker container run --name test -it \
+<p>-v my-data:/data alpine /bin/sh
+<p>
+<p># / cd /data
+<p># / echo "Some data" > data.txt
+<p># / echo "Some more data" > data2.txt
+<p># / exit
+<p>
+<p>$ cd /mnt/sda1/var/lib/docker/volumes/my-data/_data
+<p>$ ls -l
+<p>$ echo "This file we create on the host" > host-data.txt
+<p>
+<p>$ docker container run --name test2 -it \
+<p>-v my-data:/app/data \
+<p>Centos:7 /bin/bash
+<p>
+<p>24. Removing volumes:
+<p>docker container rm -f $(docker container ls -aq)
+<p>
+<p>25. Sharing data between containers:
+<p>$ docker container run -it --name writer \
+<p>-v shared-data:/data \
+<p>alpine /bin/sh
+<p>
+<p># / echo "I can create a file" > /data/sample.txt
+<p>
+<p>Read only:
+<p>$ docker container run -it --name reader \
+<p>-v shared-data:/app/data:ro \
+<p>ubuntu:17.04 /bin/bash
+<p>
+<p>26. Host volumes:
+<p>$ mkdir ~/my-web
+<p>$ cd ~/my-web
+<p>$ echo "<h1>Personal Website</h1>" > index.html
+<p>
+<p>FROM nginx:alpine
+<p>COPY . /usr/share/nginx/html
+<p>
+<p>$ docker image build -t my-website:1.0 .
+<p>$ docker container run -d \
+<p>-v $(pwd):/usr/share/nginx/html \
+<p>-p 8080:80 --name my-site\
+<p>my-website:1.0
+<p>
+<p>27. Defining volumes images:
+<p>$ docker image pull mongo:3.7
+<p>$ docker image inspect \
+<p>--format='{{json .ContainerConfig.Volumes}}' \
+<p>mongo:3.7 | jq
+<p>
+<p>$ docker run --name my-mongo -d mongo:3.7
+<p>Show volumes:
+<p>$ docker inspect --format '{{json .Mounts}}' my-mongo | jq
+<p>
+<p>28. Docker system information:
+<p>docker version
+<p>docker system info
+<p>
+<p>29. resource consumption:
+<p>docker system df (docker system df -v)
+<p>
+<p>30. Pruning unused resources:
+<p>Containers:
+<p>$ docker container prune
+<p>Images:
+<p>$ docker image prune
+<p>Volumes:
+<p>$ docker volume prune ($ docker volume prune --filter 'label=demo' --filter 'label=test')
+<p>
+<p>31. Consuming Docker system events:
+<p>$ docker system events
+<p>Format:
+<p>docker system events --format 'Type={{.Type}} Image={{.Actor.Attributes.image}} Action={{.Action}}'
+<p>
+<p>32. Network:
+<p>docker network ls
+<p>33. Create bridge network:
+<p>docker network create --driver bridge sample-net (docker network create --driver bridge --subnet "10.1.0.0/16" test-net)
+<p>ip addr (ip addr show eth0)
+<p>34. Example add to other network
+<p>$ docker container run --name c3 -d --network sample-net \
+<p>alpine:latest ping 127.0.0.1
+<p>$ docker container run --name c4 -d --network sample-net \
+<p>alpine:latest ping 127.0.0.1
+<p>
+<p>35. Connect container to other net
+<p>$ docker network connect sample-net c5
+<p>
+<p>Enter to verify
+<p>$ docker container exec -it c5 /bin/sh
+<p>
+<p>36. View net info 
+<p>docker network inspect test-net
+<p>
+<p>37. Sharing the same network-namespace:
+<p>$ docker container run --name web -d --network test-net nginx:alpine
+<p>$ docker container run -it --rm --network container:web alpine:latest /bin/sh
+<p>
+<p>38. Map container port to host port:
+<p>$ docker container run --name web -P -d nginx:alpine
+<p>$ docker container port web ($ docker container inspect web | grep HostPort) ($ docker container ls)
+<p>
+<p>$ docker container run --name web2 -p 8080:80 -d nginx:alpine
+<p>
+<p>39. Docker compose docker-compose.yml, recomended use declarative approach.
+<p>version: "3.5"
+<p>services:
+<p>web:
+<p>image: fundamentalsofdocker/ch08-web:1.0
+<p>ports:
+<p>- 3000:3000
+<p>db:
+<p>image: fundamentalsofdocker/ch08-db:1.0
+<p>volumes:
+<p>- pets-data:/var/lib/postgresql/data
+<p>volumes:
+<p>pets-data:
+<p>
+<p>40. Run docker-compose on background:
+<p>$ docker-compose up -d
+<p>(connec to data base: docker exec -it bd-pets psql --dbname=pets --username=dockeruser) (https://www.postgresql.org/docs/10/app-psql.html)
+<p>41. list conatiners part of docker-compose:
+<p>$ docker-compose ps
+<p>42. Stop and clean:
+<p>$ docker-compose down
+<p>
+<p>https://www.youtube.com/watch?v=IQRattrpoE4   (https://www.youtube.com/watch?v=bGYAkFGkUws)
+<p>
+<p>43. Scale:
+<p>$ docker-compose up --scale web=3
+<p>
+<p>44. Build images:
+<p>$ docker-compose -f docker-compose.dev.yml build
+<p>
+<p>45. Push images:
+<p>$ docker login -u manuelarias -p <password>
+<p>$ docker-compose -f docker-compose.dev.yml push
+<p>
+<p>
+<p>46. DockerSwarm:
+<p>$ docker swarm init    ($ docker swarm init --advertise-addr=eth0)
+<p>
+<p>47.Join a swarm cluster:
+<p>$ docker swarm join --token <join-token> <IP address>:2377
+<p>
+<p>48. Inspect:
+<p>docker node ls
+<p>docker node inspect <nodeCode>
+<p>
+<p>49. Promote node to manager:
+<p>$ docker-machine ssh node-1 docker node promote node-2 node-3
+<p>
+<p>50. Export join-tocken and ip:
+<p>$ export JOIN_TOKEN=$(docker swarm join-token -q worker)
+<p>$ export LEADER_ADDR=$(docker node inspect --format "{{.ManagerStatus.Addr}}" self)
+<p>
+<p>51. Creating a Docker Swarm in the cloud: ------> Page 356
+<p>$ docker stack deploy -c stack.yaml sample-stack
+<p>$ docker stack ls
+<p>$ docker service ps sample-stack_whoami 
+<p>$ watch docker stack ps sample-stack
+<p>$ docker service logs sample-stack_whoami ($ docker service logs 68rjjkdwyci1 )
+<p>
+<p>$ docker container rm -f sample-stack_whoami.2.n21e7ktyvo4b2sufalk0aibzy
+<p>
+<p>$ docker service rm sample-stack_whoami ($ docker stack rm sample-stack_whoami)
+<p>
+<p>Remove a node from Swarm:
+<p>On node: $ docker swarm leave
+<p>On master: $ docker node rm -f <node ID>
+<p>
+<p>52. Zero downtime deploy ch11/stack.yaml:
+<p>$ docker service update --image nginx:1.13-alpine web_web
+<p>
+<p>53. Healt check:
+<p>Docker File----->
+<p>FROM alpine:3.6
+<p>...
+<p>HEALTHCHECK --interval=30s \
+<p>--timeout=10s
+<p>--retries=3
+<p>--start-period=60s
+<p>CMD curl -f http://localhost:3000/health || exit 1
+<p>...
+<p>
+<p>Stack File----->
+<p>version: "3.5"
+<p>services:
+<p>web:
+<p>image: example/web:1.0
+<p>healthcheck:
+<p>test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+<p>interval: 30s
+<p>timeout: 10s
+<p>retries: 3
+<p>start_period: 60s
+<p>...
+<p>
+<p>54. Secrets:
+<p>Create secret:
+<p>$ echo "sample secret value" | docker secret create sample-secret -
+<p>Create secret from file:
+<p>$ docker secret create other-secret ~/my-secrets/secret-value.txt
+<p>Using secrets----->
+<p>$ docker service create --name web \
+<p>--secret api-secret-key \
+<p>--publish 8000:8000 \
+<p>fundamentalsofdocker/whoami:latest
+<p>
+<p>Verify the secret:
+<p>$ docker exec -it <container ID> cat /run/secrets/api-secret-key
+<p>
+<p>Secrets on Develop:
+<p>$ echo "demo secret value" > ./dev-secrets/sample-secret
+<p>$ docker container run -d --name whoami \
+<p>-p 8000:8000 \
+<p>-v $(pwd)/dev-secrets:/run/secrets \
+<p>fundamentalsofdocker/whoami:latest
+<p>
+<p>Secrets for legacy apps:
+<p>export DEMO_SECRET=`cat /run/secrets/demo-secret`
+<p>or in yalm file
+<p>...
+<p>secrets:
+<p>demo-secret: "<<demo-secret-value>>"
+<p>other-secret: "<<other-secret-value>>"
+<p>yet-another-secret: "<<yet-another-secret-value>>"
+<p>...
+<p>
+<p>Update secrets:
+<p>$ echo "newPassw0rD" | docker secret create db-password-v2 -
+<p>$ docker service update --secret-rm db-password web
+<p>$ docker service update \
+<p>--secret-add source=db-password-v2, target=db-password \
+<p>web
+<p>
+<p>
+<p>55. Kubernates:
+<p>Rolling update
+<p>$ kubectl set image deployment/web \
+<p>web=fundamentalsofdocker/ch13-web:2.0
+<p>
+<p>Status:
+<p>$ kubectl rollout status deploy/web
+<p>
+<p>Roolback:
+<p>$ kubectl rollout undo deploy/web
+<p>
+<p>
+<p>-----> For update the image Page 496
+<p>
+<p>
+<p>
+<p>    </div>
+<p></body>
+<p></html>
